@@ -87,7 +87,8 @@ public class BasicTPActivity extends AppCompatActivity {
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
                 .setDatas(list)
                 .setEmptyView(emptyView)
-                .into(findViewById(R.id.rc_list), itemViewBuilder);
+                .into(findViewById(R.id.rc_list), itemViewBuilder)
+                .setDivider(5);
     }
 
     private void setOnClick() {

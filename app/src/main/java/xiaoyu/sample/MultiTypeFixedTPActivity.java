@@ -108,7 +108,8 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore | XYOptions.isMultiType)
                 .setDatas(list)
                 .setEmptyView(emptyView)
-                .into(findViewById(R.id.rc_list), itemViewBuilder);
+                .into(findViewById(R.id.rc_list), itemViewBuilder)
+                .setDivider(5);
     }
 
     private void setOnClick() {

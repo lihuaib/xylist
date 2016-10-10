@@ -1,5 +1,7 @@
 package xiaoyu.xylist;
 
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class TemplateManger {
     public TemplateManger setDatas(List datas) {
         System.out.println("setDatas TemplateManger");
 
-        if(datas == null) {
+        if (datas == null) {
             mDatas = null;
         } else {
             if (mDatas == null) {
@@ -46,7 +48,7 @@ public class TemplateManger {
             mDatas.addAll(datas);
         }
 
-        if(mContentView != null) {
+        if (mContentView != null) {
             mTemplate.refreshData();
         }
 
@@ -66,9 +68,19 @@ public class TemplateManger {
         return mEmptyView;
     }
 
-    public ITemplate into(View contentView, ItemViewBuilder itemViewBuilder) {
+    public TemplateManger into(View contentView, ItemViewBuilder itemViewBuilder) {
         mContentView = contentView;
         mTemplate.setTemplateManager(this, contentView, itemViewBuilder);
-        return mTemplate;
+        return this;
+    }
+
+    public void setDivider(int dp) {
+        if (mContentView == null) return;
+
+        if (mContentView instanceof RecyclerView) {
+            DisplayMetrics dm = mContentView.getContext().getApplicationContext().getResources().getDisplayMetrics();
+            int px = (int)(dp * dm.density + 0.5f);
+            ((RecyclerView) mContentView).addItemDecoration(new SpaceItemDecoration(px));
+        }
     }
 }
