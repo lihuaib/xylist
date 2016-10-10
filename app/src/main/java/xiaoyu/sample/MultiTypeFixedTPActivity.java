@@ -17,9 +17,9 @@ import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.adapter.ItemViewBuilder;
 import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
-import xiaoyu.xylist.templates.BasicTemplate;
+import xiaoyu.xylist.templates.MultiTypeFixedTP;
 
-public class BasicTemplateMultiDataActivity extends AppCompatActivity {
+public class MultiTypeFixedTPActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
@@ -28,7 +28,7 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_basic_multi_types);
+        setContentView(R.layout.activity_multi_fiexed_types);
 
         setOnClick();
 
@@ -56,7 +56,7 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
 
             @Override
             public View get(int viewType) {
-                TextView textView = new TextView(BasicTemplateMultiDataActivity.this);
+                TextView textView = new TextView(MultiTypeFixedTPActivity.this);
 
                 if(viewType == 0) {
                     textView.setBackgroundColor(Color.BLACK);
@@ -97,14 +97,14 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                BasicTemplateMultiDataActivity.this.loadMore();
+                MultiTypeFixedTPActivity.this.loadMore();
             }
         });
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new BasicTemplate()))
+        (manger = XYList.load(new MultiTypeFixedTP()))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore | XYOptions.isMultiType)
                 .setDatas(list)
                 .setEmptyView(emptyView)
@@ -114,6 +114,7 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
     private void setOnClick() {
         findViewById(R.id.btn_load).setOnClickListener(btnLoadListener);
         findViewById(R.id.btn_refresh).setOnClickListener(btnRefreshListener);
+        findViewById(R.id.btn_empty).setOnClickListener(btnEmptryListener);
     }
 
     View.OnClickListener btnLoadListener = new View.OnClickListener() {
@@ -130,13 +131,25 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
         }
     };
 
+    View.OnClickListener btnEmptryListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            loadEmpty();
+        }
+    };
+
+    private void loadEmpty() {
+        list.clear();
+        manger.setDatas(list);
+    }
+
     private void loadRefresh() {
         if (list.size() > 0) {
             int start = list.get(list.size() - 1);
 
             list.clear();
             for (int i = start; i < start + 10; i++) {
-                //list.add(i);
+                list.add(i);
             }
         }
 
@@ -150,7 +163,12 @@ public class BasicTemplateMultiDataActivity extends AppCompatActivity {
             list.add(i);
         }
 
-        manger.setDatas(list);
+        findViewById(R.id.btn_load).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                manger.setDatas(list);
+            }
+        }, 1000);
 
     }
 }

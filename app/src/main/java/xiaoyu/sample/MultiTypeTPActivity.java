@@ -1,6 +1,5 @@
 package xiaoyu.sample;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +17,9 @@ import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.adapter.ItemViewBuilder;
 import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
-import xiaoyu.xylist.templates.BasicTemplate;
+import xiaoyu.xylist.templates.BasicTP;
 
-public class BasicTemplateActivity extends AppCompatActivity {
+public class MultiTypeTPActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
@@ -29,7 +28,7 @@ public class BasicTemplateActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_basic);
+        setContentView(R.layout.activity_multi_types);
 
         setOnClick();
 
@@ -38,19 +37,37 @@ public class BasicTemplateActivity extends AppCompatActivity {
             list.add(i);
         }
 
+        final List<Integer> types = new ArrayList<>();
+        types.add(0); // black textview
+        types.add(1); // red textview
+        types.add(2); // normal textview
+
         itemViewBuilder = new ItemViewBuilder();
         itemViewBuilder.setiBuildItem(new IBuildItem() {
             @Override
-            public void set(View view, int position, Object object) {
-                ((TextView) view).setText(object.toString());
+            public void set(View view, int position, Object value) {
+                int type = getItemType(position);
+                if(type == 2) {
+                    ((TextView) view).setText(value.toString());
+                } else {
+                    ((TextView) view).setText("");
+                }
             }
 
             @Override
             public View get(int viewType) {
-                TextView textView = new TextView(BasicTemplateActivity.this);
-                textView.setText("xxx");
-                textView.setTextColor(Color.WHITE);
-                textView.setBackgroundResource(R.color.colorPrimaryDark);
+                TextView textView = new TextView(MultiTypeTPActivity.this);
+
+                if(viewType == 0) {
+                    textView.setBackgroundColor(Color.BLACK);
+                } else if(viewType == 1) {
+                    textView.setBackgroundColor(Color.RED);
+                } else {
+                    textView.setText("xxx");
+                    textView.setTextColor(Color.WHITE);
+                    textView.setBackgroundResource(R.color.colorPrimaryDark);
+                }
+
                 RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 textView.setLayoutParams(params);
 
@@ -59,12 +76,16 @@ public class BasicTemplateActivity extends AppCompatActivity {
 
             @Override
             public int getItemCount() {
-                return list.size();
+                return types.size() + list.size() - 1;
             }
 
             @Override
             public int getItemType(int position) {
-                return 0;
+                if(position == 0)
+                    return 0;
+                if(position == 1)
+                    return 1;
+                return 2;
             }
         });
 
@@ -76,15 +97,15 @@ public class BasicTemplateActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                BasicTemplateActivity.this.loadMore();
+                MultiTypeTPActivity.this.loadMore();
             }
         });
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new BasicTemplate()))
-                .setOptions(XYOptions.canLoadMore)
+        (manger = XYList.load(new BasicTP()))
+                .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore | XYOptions.isMultiType)
                 .setDatas(list)
                 .setEmptyView(emptyView)
                 .into(findViewById(R.id.rc_list), itemViewBuilder);
@@ -93,13 +114,8 @@ public class BasicTemplateActivity extends AppCompatActivity {
     private void setOnClick() {
         findViewById(R.id.btn_load).setOnClickListener(btnLoadListener);
         findViewById(R.id.btn_refresh).setOnClickListener(btnRefreshListener);
+        findViewById(R.id.btn_empty).setOnClickListener(btnEmptyListener);
 
-        findViewById(R.id.btn_redirect).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BasicTemplateActivity.this, BasicTemplateMultiDataActivity.class));
-            }
-        });
     }
 
     View.OnClickListener btnLoadListener = new View.OnClickListener() {
@@ -116,9 +132,20 @@ public class BasicTemplateActivity extends AppCompatActivity {
         }
     };
 
-    private void loadRefresh() {
-        System.out.println("loadRefresh");
+    View.OnClickListener btnEmptyListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            loadEmpty();
+        }
+    };
 
+    private void loadEmpty() {
+        list.clear();
+
+        manger.setDatas(list);
+    }
+
+    private void loadRefresh() {
         if (list.size() > 0) {
             int start = list.get(list.size() - 1);
 
@@ -132,21 +159,18 @@ public class BasicTemplateActivity extends AppCompatActivity {
     }
 
     private void loadMore() {
-        System.out.println("loadMore, size=" + list.size());
-
         int start = list.size() == 0 ? 0 : list.get(list.size() - 1);
 
         for (int i = start; i < start + 10; i++) {
             list.add(i);
         }
 
-        try {
+        findViewById(R.id.btn_load).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                manger.setDatas(list);
+            }
+        }, 1000);
 
-            Thread.sleep(1000);
-        } catch (Exception ex) {
-
-        }
-
-        manger.setDatas(list);
     }
 }

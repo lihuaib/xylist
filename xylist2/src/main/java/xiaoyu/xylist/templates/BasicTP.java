@@ -36,13 +36,8 @@ import xiaoyu.xylist.interf.ITemplate;
  * <p>
  * 空布局 1
  * --- 自定义空布局 ---
- * <p>
- * 空布局 2
- * --- 数据1 ---
- * --- 数据2 ---
- * --- 自定义空布局 ---
  */
-public class BasicTemplate implements ITemplate {
+public class BasicTP implements ITemplate {
 
     private static int TYPE_FOOTER = -1;
     private static int TYPE_EMPTY = -2;
@@ -92,72 +87,22 @@ public class BasicTemplate implements ITemplate {
 
     private boolean setEmptyView() {
         if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
-            if(isMultiType()) {
-                ItemViewBuilder newBuilder = new ItemViewBuilder();
-                newBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-                newBuilder.setiBuildItem(new IBuildItem() {
-                    @Override
-                    public void set(View view, int position, Object value) {
-                        if(position < getItemCount() - 1) {
-                            itemViewBuilder.getiBuildItem().set(view, position, value);
-                        }
-                    }
+            findListViewPos();
 
-                    @Override
-                    public View get(int viewType) {
-                        if(viewType == TYPE_EMPTY) {
-                            View emptyView = mManager.getEmptyView();
-                            emptyView.setLayoutParams(recyclerView.getLayoutParams());
-
-                            return emptyView;
-                        }
-
-                        return itemViewBuilder.getiBuildItem().get(viewType);
-                    }
-
-                    @Override
-                    public int getItemType(int position) {
-                        if(position == getItemCount() - 1) {
-                            return TYPE_EMPTY;
-                        }
-                        return itemViewBuilder.getiBuildItem().getItemType(position);
-                    }
-
-                    @Override
-                    public int getItemCount() {
-                        return itemViewBuilder.getiBuildItem().getItemCount() + 1;
-                    }
-                });
-
-                adapter.setItemViewBuilder(newBuilder);
+            View view = mManager.getEmptyView();
+            if (ptrFrameLayout == null) {
+                view.setLayoutParams(recyclerView.getLayoutParams());
             } else {
-                findListViewPos();
-
-                View view = mManager.getEmptyView();
-                if (ptrFrameLayout == null) {
-                    view.setLayoutParams(recyclerView.getLayoutParams());
-                } else {
-                    view.setLayoutParams(ptrFrameLayout.getLayoutParams());
-                }
-
-                parentGroup.removeViewAt(listViewPos);
-                parentGroup.addView(view, listViewPos);
-
-                return true;
+                view.setLayoutParams(ptrFrameLayout.getLayoutParams());
             }
+
+            parentGroup.removeViewAt(listViewPos);
+            parentGroup.addView(view, listViewPos);
+
+            return true;
         }
 
         return false;
-    }
-
-    private boolean isMultiType() {
-        if(this.itemViewBuilder == null) return false;
-        if(this.itemViewBuilder.getiBuildItem() == null) return false;
-        if(this.itemViewBuilder.getiBuildItem().getItemCount() == mManager.getDatas().size()) return false;
-        if(this.itemViewBuilder.getiBuildItem().getItemCount() == (mManager.getDatas().size() + 1)
-            && isOption(XYOptions.canLoadMore)) return false;
-
-        return true;
     }
 
     private void buildAdapter() {
@@ -195,7 +140,7 @@ public class BasicTemplate implements ITemplate {
 
         parentGroup.removeViewAt(listViewPos);
 
-        if(ptrFrameLayout == null) {
+        if (ptrFrameLayout == null) {
             ptrFrameLayout = new XYPtrFrameLayout(recyclerView.getContext());
 
             ptrFrameLayout.setLayoutParams(recyclerView.getLayoutParams());
@@ -207,9 +152,9 @@ public class BasicTemplate implements ITemplate {
     }
 
     private void findListViewPos() {
-        if(listViewPos != -1) return;
+        if (listViewPos != -1) return;
 
-        if(parentGroup == null) {
+        if (parentGroup == null) {
             parentGroup = (ViewGroup) recyclerView.getParent();
         }
         int cnt = parentGroup.getChildCount();
@@ -256,8 +201,8 @@ public class BasicTemplate implements ITemplate {
         newBuilder.setiBuildItem(new IBuildItem() {
             @Override
             public void set(View view, int position, Object value) {
-                if(getItemType(position) == TYPE_FOOTER) {
-                    if(xyFooterView.getStatus() != XYFooterView.STATUS_NO_MORE_LOAD) {
+                if (getItemType(position) == TYPE_FOOTER) {
+                    if (xyFooterView.getStatus() != XYFooterView.STATUS_NO_MORE_LOAD) {
                         xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
                     }
                 } else {
@@ -267,7 +212,7 @@ public class BasicTemplate implements ITemplate {
 
             @Override
             public View get(int viewType) {
-                if(viewType == TYPE_FOOTER) {
+                if (viewType == TYPE_FOOTER) {
                     return xyFooterView;
                 }
 
@@ -276,7 +221,7 @@ public class BasicTemplate implements ITemplate {
 
             @Override
             public int getItemType(int position) {
-                if(position == getItemCount() - 1) {
+                if (position == getItemCount() - 1) {
                     return TYPE_FOOTER;
                 }
                 return itemViewBuilder.getiBuildItem().getItemType(position);
@@ -291,7 +236,7 @@ public class BasicTemplate implements ITemplate {
         adapter.setItemViewBuilder(newBuilder);
 
         recyclerView.removeOnScrollListener(mScrollListener);
-        if(mManager.getDatas() == null || mManager.getDatas().size() == 0) {
+        if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
             xyFooterView.setStatus(XYFooterView.STATUS_NO_MORE_LOAD);
         } else {
             xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
@@ -304,10 +249,10 @@ public class BasicTemplate implements ITemplate {
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            if(itemViewBuilder.getDataLoad() == null) return;
-            if(xyFooterView == null) return;
-            if(xyFooterView.getStatus() != XYFooterView.STATUS_LOAD_MORE) return;
-            if(dy <= 0) return;
+            if (itemViewBuilder.getDataLoad() == null) return;
+            if (xyFooterView == null) return;
+            if (xyFooterView.getStatus() != XYFooterView.STATUS_LOAD_MORE) return;
+            if (dy <= 0) return;
 
             int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
             if (lastVisibleItemPosition == itemViewBuilder.getiBuildItem().getItemCount()) {
