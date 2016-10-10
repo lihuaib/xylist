@@ -78,12 +78,12 @@ public class BasicTP implements ITemplate {
     public void refreshData() {
         if (recyclerView == null) return;
 
-        init();
-        if (setEmptyView()) return;
-
         if (ptrFrameLayout != null) {
             ptrFrameLayout.refreshComplete();
         }
+
+        init();
+        if (setEmptyView()) return;
 
         adapter.notifyDataSetChanged();
     }
