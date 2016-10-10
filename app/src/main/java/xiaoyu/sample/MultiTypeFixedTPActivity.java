@@ -47,7 +47,7 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
             @Override
             public void set(View view, int position, Object value) {
                 int type = getItemType(position);
-                if(type == 2) {
+                if (type == 2) {
                     ((TextView) view).setText(value.toString());
                 } else {
                     ((TextView) view).setText("");
@@ -58,9 +58,9 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
             public View get(int viewType) {
                 TextView textView = new TextView(MultiTypeFixedTPActivity.this);
 
-                if(viewType == 0) {
+                if (viewType == 0) {
                     textView.setBackgroundColor(Color.BLACK);
-                } else if(viewType == 1) {
+                } else if (viewType == 1) {
                     textView.setBackgroundColor(Color.RED);
                 } else {
                     textView.setText("xxx");
@@ -81,9 +81,9 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
 
             @Override
             public int getItemType(int position) {
-                if(position == 0)
+                if (position == 0)
                     return 0;
-                if(position == 1)
+                if (position == 1)
                     return 1;
                 return 2;
             }
@@ -144,13 +144,11 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
     }
 
     private void loadRefresh() {
-        if (list.size() > 0) {
-            int start = list.get(list.size() - 1);
+        int start = 0;
 
-            list.clear();
-            for (int i = start; i < start + 10; i++) {
-                list.add(i);
-            }
+        list.clear();
+        for (int i = start; i < start + 10; i++) {
+            list.add(i);
         }
 
         manger.setDatas(list);

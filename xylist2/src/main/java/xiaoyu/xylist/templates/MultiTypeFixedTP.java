@@ -49,7 +49,12 @@ public class MultiTypeFixedTP implements ITemplate {
 
     private TemplateManger mManager;
     private RecyclerView recyclerView;
+
     private ItemViewBuilder itemViewBuilder;
+    private ItemViewBuilder currentUsedViewBuilder;
+    private ItemViewBuilder withFootViewBuilder;
+    private ItemViewBuilder withEmptyViewBuilder;
+
     private XYAdapter adapter;
 
     private ViewGroup parentGroup;
@@ -68,6 +73,7 @@ public class MultiTypeFixedTP implements ITemplate {
 
         this.recyclerView = (RecyclerView) contentView;
         this.itemViewBuilder = itemViewBuilder;
+        currentUsedViewBuilder = itemViewBuilder;
 
         refreshData();
     }
@@ -93,9 +99,9 @@ public class MultiTypeFixedTP implements ITemplate {
 
     private boolean setEmptyView() {
         if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
-            ItemViewBuilder newBuilder = new ItemViewBuilder();
-            newBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-            newBuilder.setiBuildItem(new IBuildItem() {
+            withEmptyViewBuilder = new ItemViewBuilder();
+            withEmptyViewBuilder.setDataLoad(itemViewBuilder.getDataLoad());
+            withEmptyViewBuilder.setiBuildItem(new IBuildItem() {
                 @Override
                 public void set(View view, int position, Object value) {
                     if (position < getItemCount() - 1) {
@@ -126,22 +132,24 @@ public class MultiTypeFixedTP implements ITemplate {
 
                 @Override
                 public int getItemCount() {
-                    if(mManager.getEmptyView() == null) {
+                    if (mManager.getEmptyView() == null) {
                         return itemViewBuilder.getiBuildItem().getItemCount();
                     }
                     return itemViewBuilder.getiBuildItem().getItemCount() + 1;
                 }
             });
 
-            adapter.setItemViewBuilder(newBuilder);
+            adapter.setItemViewBuilder(withEmptyViewBuilder);
             return true;
+        } else {
+            adapter.setItemViewBuilder(currentUsedViewBuilder);
         }
 
         return false;
     }
 
     private void buildAdapter() {
-        if(adapter == null) {
+        if (adapter == null) {
             adapter = new XYAdapter(mManager);
             adapter.setItemViewBuilder(itemViewBuilder);
 
@@ -203,7 +211,7 @@ public class MultiTypeFixedTP implements ITemplate {
     }
 
     private void setHeader() {
-        if(xyHeaderView != null) return;
+        if (xyHeaderView != null) return;
 
         xyHeaderView = new XYHeaderView(recyclerView.getContext());
         xyHeaderView.setLayoutParams(new PtrFrameLayout.LayoutParams(PtrFrameLayout.LayoutParams.MATCH_PARENT, PtrFrameLayout.LayoutParams.WRAP_CONTENT));
@@ -231,14 +239,14 @@ public class MultiTypeFixedTP implements ITemplate {
     }
 
     private void setFooter() {
-        if(xyFooterView == null) {
+        if (xyFooterView == null) {
             xyFooterView = XYFooterView.get(recyclerView.getContext());
             xyFooterView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
 
-            ItemViewBuilder newBuilder = new ItemViewBuilder();
-            newBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-            newBuilder.setiBuildItem(new IBuildItem() {
+            withFootViewBuilder = new ItemViewBuilder();
+            withFootViewBuilder.setDataLoad(itemViewBuilder.getDataLoad());
+            withFootViewBuilder.setiBuildItem(new IBuildItem() {
                 @Override
                 public void set(View view, int position, Object value) {
                     if (getItemType(position) != TYPE_FOOTER) {
@@ -269,7 +277,8 @@ public class MultiTypeFixedTP implements ITemplate {
                 }
             });
 
-            adapter.setItemViewBuilder(newBuilder);
+            adapter.setItemViewBuilder(withFootViewBuilder);
+            currentUsedViewBuilder = withFootViewBuilder;
         }
 
         recyclerView.removeOnScrollListener(mScrollListener);
