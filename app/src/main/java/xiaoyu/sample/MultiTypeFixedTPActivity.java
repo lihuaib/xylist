@@ -157,15 +157,15 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
     }
 
     private void loadMore() {
-        int start = list.size() == 0 ? 0 : list.get(list.size() - 1);
-
-        for (int i = start; i < start + 10; i++) {
-            list.add(i);
-        }
-
         findViewById(R.id.btn_load).postDelayed(new Runnable() {
             @Override
             public void run() {
+                int start = list.size() == 0 ? 0 : list.get(list.size() - 1);
+
+                for (int i = start; i < start + 10; i++) {
+                    list.add(i);
+                }
+
                 manger.setDatas(list);
             }
         }, 1000);

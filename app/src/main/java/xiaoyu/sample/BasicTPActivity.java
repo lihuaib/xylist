@@ -135,13 +135,11 @@ public class BasicTPActivity extends AppCompatActivity {
     private void loadRefresh() {
         System.out.println("loadRefresh");
 
-        if (list.size() > 0) {
-            int start = list.get(list.size() - 1);
+        int start = 0;
 
-            list.clear();
-            for (int i = start; i < start + 10; i++) {
-                list.add(i);
-            }
+        list.clear();
+        for (int i = start; i < start + 10; i++) {
+            list.add(i);
         }
 
         manger.setDatas(list);
@@ -150,17 +148,19 @@ public class BasicTPActivity extends AppCompatActivity {
     private void loadMore() {
         System.out.println("loadMore, size=" + list.size());
 
-        int start = list.size() == 0 ? 0 : list.get(list.size() - 1);
-
-        for (int i = start; i < start + 10; i++) {
-            list.add(i);
-        }
-
         findViewById(R.id.btn_load).postDelayed(new Runnable() {
             @Override
             public void run() {
+                int start = list.size() == 0 ? 0 : list.get(list.size() - 1);
+
+                if (start <= 40) {
+                    for (int i = start; i < start + 10; i++) {
+                        list.add(i);
+                    }
+                }
+
                 manger.setDatas(list);
             }
-        }, 10000);
+        }, 3000);
     }
 }

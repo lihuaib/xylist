@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import xiaoyu.xylist.TemplateManger;
 import xiaoyu.xylist.XYOptions;
 
@@ -16,15 +14,10 @@ import xiaoyu.xylist.XYOptions;
 public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private TemplateManger mManager;
-    private List datas;
     private ItemViewBuilder itemViewBuilder;
 
     public XYAdapter(TemplateManger manger) {
         mManager = manger;
-    }
-
-    public void setDatas(List datas) {
-        this.datas = datas;
     }
 
     public void setItemViewBuilder(ItemViewBuilder itemViewBuilder) {
@@ -46,12 +39,12 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         if (XYOptions.isContains(XYOptions.isMultiType, mManager.getOptions())) {
-            pos = position - total + datas.size();
+            pos = position - total + mManager.getDatas().size();
         }
 
         Object value = null;
-        if (pos >= 0 && pos < datas.size()) {
-            value = datas.get(pos);
+        if (pos >= 0 && pos < mManager.getDatas().size()) {
+            value = mManager.getDatas().get(pos);
         }
 
         itemViewBuilder.getiBuildItem().set(holder.itemView, position, value);

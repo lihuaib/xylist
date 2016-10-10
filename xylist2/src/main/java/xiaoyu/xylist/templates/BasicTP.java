@@ -5,6 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import xiaoyu.xylist.TemplateManger;
@@ -34,7 +37,7 @@ import xiaoyu.xylist.interf.ITemplate;
  * --- 7 ----
  * --- 尾部 ---
  * <p>
- * 空布局 1
+ * 空布局
  * --- 自定义空布局 ---
  */
 public class BasicTP implements ITemplate {
@@ -51,6 +54,12 @@ public class BasicTP implements ITemplate {
     private XYHeaderView xyHeaderView;
     private XYFooterView xyFooterView;
     private XYPtrFrameLayout ptrFrameLayout;
+
+    /**
+     * 用于底部加载控件的状态显示
+     */
+    private List tmpList = new ArrayList();
+
     private int listViewPos = -1;
 
     @Override
@@ -76,7 +85,6 @@ public class BasicTP implements ITemplate {
             ptrFrameLayout.refreshComplete();
         }
 
-        adapter.setDatas(mManager.getDatas());
         adapter.notifyDataSetChanged();
     }
 
@@ -90,13 +98,15 @@ public class BasicTP implements ITemplate {
             findListViewPos();
 
             View view = mManager.getEmptyView();
+            parentGroup.removeViewAt(listViewPos);
+            if(view == null) return true;
+
             if (ptrFrameLayout == null) {
                 view.setLayoutParams(recyclerView.getLayoutParams());
             } else {
                 view.setLayoutParams(ptrFrameLayout.getLayoutParams());
             }
 
-            parentGroup.removeViewAt(listViewPos);
             parentGroup.addView(view, listViewPos);
 
             return true;
@@ -106,12 +116,13 @@ public class BasicTP implements ITemplate {
     }
 
     private void buildAdapter() {
-        adapter = new XYAdapter(mManager);
-        adapter.setDatas(mManager.getDatas());
-        adapter.setItemViewBuilder(itemViewBuilder);
+        if(adapter == null) {
+            adapter = new XYAdapter(mManager);
+            adapter.setItemViewBuilder(itemViewBuilder);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     private void setListView() {
@@ -167,6 +178,8 @@ public class BasicTP implements ITemplate {
     }
 
     private void setHeader() {
+        if(xyHeaderView != null) return;
+
         xyHeaderView = new XYHeaderView(recyclerView.getContext());
         xyHeaderView.setLayoutParams(new PtrFrameLayout.LayoutParams(PtrFrameLayout.LayoutParams.MATCH_PARENT, PtrFrameLayout.LayoutParams.WRAP_CONTENT));
 
@@ -193,55 +206,61 @@ public class BasicTP implements ITemplate {
     }
 
     private void setFooter() {
-        xyFooterView = XYFooterView.get(recyclerView.getContext());
-        xyFooterView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        if(xyFooterView == null) {
+            xyFooterView = XYFooterView.get(recyclerView.getContext());
+            xyFooterView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
 
-        ItemViewBuilder newBuilder = new ItemViewBuilder();
-        newBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-        newBuilder.setiBuildItem(new IBuildItem() {
-            @Override
-            public void set(View view, int position, Object value) {
-                if (getItemType(position) == TYPE_FOOTER) {
-                    if (xyFooterView.getStatus() != XYFooterView.STATUS_NO_MORE_LOAD) {
-                        xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
+            ItemViewBuilder newBuilder = new ItemViewBuilder();
+            newBuilder.setDataLoad(itemViewBuilder.getDataLoad());
+            newBuilder.setiBuildItem(new IBuildItem() {
+                @Override
+                public void set(View view, int position, Object value) {
+                    if (getItemType(position) != TYPE_FOOTER) {
+                        itemViewBuilder.getiBuildItem().set(view, position, value);
                     }
-                } else {
-                    itemViewBuilder.getiBuildItem().set(view, position, value);
-                }
-            }
-
-            @Override
-            public View get(int viewType) {
-                if (viewType == TYPE_FOOTER) {
-                    return xyFooterView;
                 }
 
-                return itemViewBuilder.getiBuildItem().get(viewType);
-            }
+                @Override
+                public View get(int viewType) {
+                    if (viewType == TYPE_FOOTER) {
+                        return xyFooterView;
+                    }
 
-            @Override
-            public int getItemType(int position) {
-                if (position == getItemCount() - 1) {
-                    return TYPE_FOOTER;
+                    return itemViewBuilder.getiBuildItem().get(viewType);
                 }
-                return itemViewBuilder.getiBuildItem().getItemType(position);
-            }
 
-            @Override
-            public int getItemCount() {
-                return itemViewBuilder.getiBuildItem().getItemCount() + 1;
-            }
-        });
+                @Override
+                public int getItemType(int position) {
+                    if (position == getItemCount() - 1) {
+                        return TYPE_FOOTER;
+                    }
+                    return itemViewBuilder.getiBuildItem().getItemType(position);
+                }
 
-        adapter.setItemViewBuilder(newBuilder);
+                @Override
+                public int getItemCount() {
+                    return itemViewBuilder.getiBuildItem().getItemCount() + 1;
+                }
+            });
+
+            adapter.setItemViewBuilder(newBuilder);
+        }
 
         recyclerView.removeOnScrollListener(mScrollListener);
-        if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
+        xyFooterView.setOnClickListener(null);
+        xyFooterView.setClickable(false);
+        if (tmpList.size() == mManager.getDatas().size() && xyFooterView.getStatus() == XYFooterView.STATUS_LOADING) {
             xyFooterView.setStatus(XYFooterView.STATUS_NO_MORE_LOAD);
         } else {
-            xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
             recyclerView.addOnScrollListener(mScrollListener);
+            xyFooterView.setStatus(XYFooterView.STATUS_LOAD_MORE);
+            xyFooterView.setClickable(true);
+            xyFooterView.setOnClickListener(mFootClickListener);
         }
+
+        tmpList.clear();
+        tmpList.addAll(mManager.getDatas());
     }
 
     private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
@@ -259,6 +278,17 @@ public class BasicTP implements ITemplate {
                 xyFooterView.setStatus(XYFooterView.STATUS_LOADING);
                 itemViewBuilder.getDataLoad().loadMore();
             }
+        }
+    };
+
+    private View.OnClickListener mFootClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (xyFooterView == null) return;
+            if (xyFooterView.getStatus() != XYFooterView.STATUS_LOAD_MORE) return;
+
+            xyFooterView.setStatus(XYFooterView.STATUS_LOADING);
+            itemViewBuilder.getDataLoad().loadMore();
         }
     };
 }

@@ -2,6 +2,7 @@ package xiaoyu.xylist;
 
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import xiaoyu.xylist.adapter.ItemViewBuilder;
@@ -33,7 +34,18 @@ public class TemplateManger {
     }
 
     public TemplateManger setDatas(List datas) {
-        mDatas = datas;
+        System.out.println("setDatas TemplateManger");
+
+        if(datas == null) {
+            mDatas = null;
+        } else {
+            if (mDatas == null) {
+                mDatas = new ArrayList();
+            }
+            mDatas.clear();
+            mDatas.addAll(datas);
+        }
+
         if(mContentView != null) {
             mTemplate.refreshData();
         }
