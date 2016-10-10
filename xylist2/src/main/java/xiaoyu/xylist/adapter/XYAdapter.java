@@ -39,7 +39,7 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         if (XYOptions.isContains(XYOptions.isMultiType, mManager.getOptions())) {
-            pos = position - total + mManager.getDatas().size();
+            pos = position - total + (mManager.getDatas() == null ? 0 : mManager.getDatas().size());
         }
 
         Object value = null;
