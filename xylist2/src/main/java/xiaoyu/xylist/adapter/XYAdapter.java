@@ -43,8 +43,10 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         Object value = null;
-        if (pos >= 0 && pos < mManager.getDatas().size()) {
-            value = mManager.getDatas().get(pos);
+        if(mManager.getDatas() != null) {
+            if (pos >= 0 && pos < mManager.getDatas().size()) {
+                value = mManager.getDatas().get(pos);
+            }
         }
 
         itemViewBuilder.getiBuildItem().set(holder.itemView, position, value);
