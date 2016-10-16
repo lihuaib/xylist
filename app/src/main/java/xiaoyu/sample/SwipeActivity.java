@@ -1,6 +1,5 @@
 package xiaoyu.sample;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +18,10 @@ import xiaoyu.xylist.adapter.ItemViewBuilder;
 import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
 import xiaoyu.xylist.templates.BasicTP;
+import xiaoyu.xylist.templates.swipe.SwipeItem;
+import xiaoyu.xylist.templates.swipe.SwipeTP;
 
-public class BasicTPActivity extends AppCompatActivity {
+public class SwipeActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
@@ -29,7 +30,7 @@ public class BasicTPActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_basictp);
+        setContentView(R.layout.activity_swipe);
 
         setOnClick();
 
@@ -42,19 +43,35 @@ public class BasicTPActivity extends AppCompatActivity {
         itemViewBuilder.setiBuildItem(new IBuildItem() {
             @Override
             public void set(View view, int position, Object object) {
-                ((TextView) view).setText(object.toString());
+                SwipeItem item = (SwipeItem) view;
+
+                TextView tv = (TextView) item.getContentView();
+                tv.setText(object.toString());
+
+                TextView tv2 = (TextView) item.getMenus();
+                tv2.setText("menu:" + object.toString());
             }
 
             @Override
             public View get(int viewType) {
-                TextView textView = new TextView(BasicTPActivity.this);
+                SwipeItem item = new SwipeItem(SwipeActivity.this);
+
+                TextView textView = new TextView(SwipeActivity.this);
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
                 textView.setBackgroundResource(R.color.colorPrimaryDark);
-                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                textView.setLayoutParams(params);
 
-                return textView;
+                TextView textView2 = new TextView(SwipeActivity.this);
+                textView2.setText("kkk");
+                textView2.setTextColor(Color.BLACK);
+                textView2.setBackgroundColor(Color.WHITE);
+
+                item.setViews(textView, textView2);
+
+                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                item.setLayoutParams(params);
+
+                return item;
             }
 
             @Override
@@ -76,14 +93,14 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                BasicTPActivity.this.loadMore();
+                SwipeActivity.this.loadMore();
             }
         });
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new BasicTP()))
+        (manger = XYList.load(new SwipeTP()))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
                 .setDatas(list)
                 .setEmptyView(emptyView)
@@ -95,27 +112,6 @@ public class BasicTPActivity extends AppCompatActivity {
         findViewById(R.id.btn_load).setOnClickListener(btnLoadListener);
         findViewById(R.id.btn_refresh).setOnClickListener(btnRefreshListener);
         findViewById(R.id.btn_empty).setOnClickListener(btnEmptyListener);
-
-        findViewById(R.id.btn_redirect1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BasicTPActivity.this, MultiTypeTPActivity.class));
-            }
-        });
-
-        findViewById(R.id.btn_redirect2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BasicTPActivity.this, MultiTypeFixedTPActivity.class));
-            }
-        });
-
-        findViewById(R.id.btn_redirect3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BasicTPActivity.this, SwipeActivity.class));
-            }
-        });
     }
 
     View.OnClickListener btnLoadListener = new View.OnClickListener() {

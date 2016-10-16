@@ -17,7 +17,7 @@ import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.adapter.ItemViewBuilder;
 import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
-import xiaoyu.xylist.templates.MultiTypeFixedTP;
+import xiaoyu.xylist.templates.MultiTypeFixedHeaderTP;
 
 public class MultiTypeFixedTPActivity extends AppCompatActivity {
 
@@ -104,12 +104,12 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new MultiTypeFixedTP()))
+        (manger = XYList.load(new MultiTypeFixedHeaderTP()))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore | XYOptions.isMultiType)
                 .setDatas(list)
                 .setEmptyView(emptyView)
-                .into(findViewById(R.id.rc_list), itemViewBuilder)
-                .setDivider(5);
+                .setDivider(5)
+                .into(findViewById(R.id.rc_list), itemViewBuilder);
     }
 
     private void setOnClick() {

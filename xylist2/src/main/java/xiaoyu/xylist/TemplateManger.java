@@ -21,6 +21,7 @@ public class TemplateManger {
     private View mEmptyView;
     private int mOptions;
     private List mDatas;
+    private int dividePx;
 
     public TemplateManger(ITemplate template) {
         this.mTemplate = template;
@@ -70,17 +71,23 @@ public class TemplateManger {
 
     public TemplateManger into(View contentView, ItemViewBuilder itemViewBuilder) {
         mContentView = contentView;
+
+        if (mContentView instanceof RecyclerView) {
+            dpToPx();
+            ((RecyclerView) mContentView).addItemDecoration(new SpaceItemDecoration(dividePx));
+        }
+
         mTemplate.setTemplateManager(this, contentView, itemViewBuilder);
         return this;
     }
 
-    public void setDivider(int dp) {
-        if (mContentView == null) return;
+    public TemplateManger setDivider(int dp) {
+        dividePx = dp;
+        return this;
+    }
 
-        if (mContentView instanceof RecyclerView) {
-            DisplayMetrics dm = mContentView.getContext().getApplicationContext().getResources().getDisplayMetrics();
-            int px = (int)(dp * dm.density + 0.5f);
-            ((RecyclerView) mContentView).addItemDecoration(new SpaceItemDecoration(px));
-        }
+    private void dpToPx() {
+        DisplayMetrics dm = mContentView.getContext().getApplicationContext().getResources().getDisplayMetrics();
+        dividePx = (int)(dividePx * dm.density + 0.5f);
     }
 }

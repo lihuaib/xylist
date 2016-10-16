@@ -18,6 +18,7 @@
 
         <activity android:name="xiaoyu.sample.MultiTypeTPActivity" />
         <activity android:name="xiaoyu.sample.MultiTypeFixedTPActivity" />
+        <activity android:name="xiaoyu.sample.SwipeActivity" />
 
     </application>
 

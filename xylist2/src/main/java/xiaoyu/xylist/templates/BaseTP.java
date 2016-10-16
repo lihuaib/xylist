@@ -21,49 +21,37 @@ import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.ITemplate;
 
 /**
- * Created by lee on 16/10/8.
- * <p>
- * 最基本的模版, 结构如下, 是 竖向 的结构
- * --- BasicTemplate ----
- * <p>
- * 布局
- * --- 头部 ---
- * --- 1 ----
- * --- 2 ----
- * --- 3 ----
- * --- 4 ----
- * --- 5 ----
- * --- 6 ----
- * --- 7 ----
- * --- 尾部 ---
- * <p>
- * 空布局
- * --- 数据1 ---
- * --- 数据2 ---
- * --- 自定义空布局 ---
+ * Created by lee on 16/10/16.
  */
-public class MultiTypeFixedTP implements ITemplate {
 
-    private static int TYPE_FOOTER = -1;
-    private static int TYPE_EMPTY = -2;
+public abstract class BaseTP implements ITemplate {
 
-    private TemplateManger mManager;
-    private RecyclerView recyclerView;
+    protected static int TYPE_FOOTER = -1;
+    protected static int TYPE_EMPTY = -2;
 
-    private ItemViewBuilder itemViewBuilder;
-    private ItemViewBuilder currentUsedViewBuilder;
-    private ItemViewBuilder withFootViewBuilder;
-    private ItemViewBuilder withEmptyViewBuilder;
+    protected TemplateManger mManager;
 
-    private XYAdapter adapter;
+    protected RecyclerView recyclerView;
+    protected LinearLayoutManager linearLayoutManager;
 
-    private ViewGroup parentGroup;
-    private XYHeaderView xyHeaderView;
-    private XYFooterView xyFooterView;
-    private XYPtrFrameLayout ptrFrameLayout;
-    private int listViewPos = -1;
+    protected ItemViewBuilder itemViewBuilder;
+    protected ItemViewBuilder currentUsedViewBuilder;
+    protected ItemViewBuilder withFootViewBuilder;
+    protected ItemViewBuilder withEmptyViewBuilder;
 
-    private List tmpList = new ArrayList();
+    protected XYAdapter adapter;
+
+    protected ViewGroup parentGroup;
+    protected XYHeaderView xyHeaderView;
+    protected XYFooterView xyFooterView;
+    protected XYPtrFrameLayout ptrFrameLayout;
+
+    /**
+     * 用于底部加载控件的状态显示
+     */
+    protected List tmpList = new ArrayList();
+
+    protected int listViewPos = -1;
 
     @Override
     public void setTemplateManager(TemplateManger manager, View contentView, ItemViewBuilder itemViewBuilder) {
@@ -73,7 +61,7 @@ public class MultiTypeFixedTP implements ITemplate {
 
         this.recyclerView = (RecyclerView) contentView;
         this.itemViewBuilder = itemViewBuilder;
-        currentUsedViewBuilder = itemViewBuilder;
+        this.currentUsedViewBuilder = itemViewBuilder;
 
         refreshData();
     }
@@ -98,63 +86,14 @@ public class MultiTypeFixedTP implements ITemplate {
         setListView();
     }
 
-    private boolean setEmptyView() {
-        if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
-            withEmptyViewBuilder = new ItemViewBuilder();
-            withEmptyViewBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-            withEmptyViewBuilder.setiBuildItem(new IBuildItem() {
-                @Override
-                public void set(View view, int position, Object value) {
-                    if (position < getItemCount() - 1) {
-                        itemViewBuilder.getiBuildItem().set(view, position, value);
-                    }
-                }
-
-                @Override
-                public View get(int viewType) {
-                    if (viewType == TYPE_EMPTY) {
-                        View emptyView = mManager.getEmptyView();
-                        emptyView.setLayoutParams(recyclerView.getLayoutParams());
-
-                        return emptyView;
-                    }
-
-                    return itemViewBuilder.getiBuildItem().get(viewType);
-                }
-
-                @Override
-                public int getItemType(int position) {
-                    if (mManager.getEmptyView() != null
-                            && position == getItemCount() - 1) {
-                        return TYPE_EMPTY;
-                    }
-                    return itemViewBuilder.getiBuildItem().getItemType(position);
-                }
-
-                @Override
-                public int getItemCount() {
-                    if (mManager.getEmptyView() == null) {
-                        return itemViewBuilder.getiBuildItem().getItemCount();
-                    }
-                    return itemViewBuilder.getiBuildItem().getItemCount() + 1;
-                }
-            });
-
-            adapter.setItemViewBuilder(withEmptyViewBuilder);
-            return true;
-        } else {
-            adapter.setItemViewBuilder(currentUsedViewBuilder);
-        }
-
-        return false;
-    }
+    public abstract boolean setEmptyView();
 
     private void buildAdapter() {
-        if (adapter == null) {
+        if(adapter == null) {
             adapter = new XYAdapter(mManager);
             adapter.setItemViewBuilder(itemViewBuilder);
 
-            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+            recyclerView.setLayoutManager(linearLayoutManager = new LinearLayoutManager(recyclerView.getContext()));
             recyclerView.setAdapter(adapter);
         }
     }
@@ -196,7 +135,7 @@ public class MultiTypeFixedTP implements ITemplate {
         parentGroup.addView(ptrFrameLayout, listViewPos);
     }
 
-    private void findListViewPos() {
+    protected void findListViewPos() {
         if (listViewPos != -1) return;
 
         if (parentGroup == null) {
@@ -212,7 +151,7 @@ public class MultiTypeFixedTP implements ITemplate {
     }
 
     private void setHeader() {
-        if (xyHeaderView != null) return;
+        if(xyHeaderView != null) return;
 
         xyHeaderView = new XYHeaderView(recyclerView.getContext());
         xyHeaderView.setLayoutParams(new PtrFrameLayout.LayoutParams(PtrFrameLayout.LayoutParams.MATCH_PARENT, PtrFrameLayout.LayoutParams.WRAP_CONTENT));
@@ -308,7 +247,7 @@ public class MultiTypeFixedTP implements ITemplate {
             if (xyFooterView.getStatus() != XYFooterView.STATUS_LOAD_MORE) return;
             if (dy <= 0) return;
 
-            int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+            int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
             if (lastVisibleItemPosition == itemViewBuilder.getiBuildItem().getItemCount()) {
                 xyFooterView.setStatus(XYFooterView.STATUS_LOADING);
                 itemViewBuilder.getDataLoad().loadMore();
@@ -326,4 +265,5 @@ public class MultiTypeFixedTP implements ITemplate {
             itemViewBuilder.getDataLoad().loadMore();
         }
     };
+
 }

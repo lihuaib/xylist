@@ -32,24 +32,6 @@
         android:layout_toRightOf="@+id/btn_load"
         android:text="空数据" />
 
-    <Button
-        android:id="@+id/btn_redirect1"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="多类型数据 1" />
-
-    <Button
-        android:id="@+id/btn_redirect2"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="多类型数据 2" />
-
-    <Button
-        android:id="@+id/btn_redirect3"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="想左滚动, 可以删除" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rc_list"
         android:layout_width="match_parent"
