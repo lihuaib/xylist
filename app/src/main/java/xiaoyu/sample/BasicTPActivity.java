@@ -15,16 +15,14 @@ import java.util.List;
 import xiaoyu.xylist.TemplateManger;
 import xiaoyu.xylist.XYList;
 import xiaoyu.xylist.XYOptions;
-import xiaoyu.xylist.adapter.ItemViewBuilder;
-import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
+import xiaoyu.xylist.interf.IViewBehavior;
 import xiaoyu.xylist.templates.BasicTP;
 
 public class BasicTPActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
-    ItemViewBuilder itemViewBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +36,18 @@ public class BasicTPActivity extends AppCompatActivity {
             list.add(i);
         }
 
-        itemViewBuilder = new ItemViewBuilder();
-        itemViewBuilder.setiBuildItem(new IBuildItem() {
+        List<IViewBehavior> iViewBehaviors = new ArrayList<>();
+        iViewBehaviors.add(new IViewBehavior() {
+            TextView textView;
+
             @Override
-            public void set(View view, int position, Object object) {
-                ((TextView) view).setText(object.toString());
+            public List getData() {
+                return list;
             }
 
             @Override
-            public View get(int viewType) {
-                TextView textView = new TextView(BasicTPActivity.this);
+            public View getView() {
+                textView = new TextView(BasicTPActivity.this);
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
                 textView.setBackgroundResource(R.color.colorPrimaryDark);
@@ -58,17 +58,12 @@ public class BasicTPActivity extends AppCompatActivity {
             }
 
             @Override
-            public int getItemCount() {
-                return list.size();
-            }
-
-            @Override
-            public int getItemType(int position) {
-                return 0;
+            public void setValue(Object o) {
+                textView.setText(o.toString());
             }
         });
 
-        itemViewBuilder.setDataLoad(new IDataLoad() {
+        IDataLoad iDataLoad = new IDataLoad() {
             @Override
             public void refresh() {
                 loadRefresh();
@@ -78,7 +73,7 @@ public class BasicTPActivity extends AppCompatActivity {
             public void loadMore() {
                 BasicTPActivity.this.loadMore();
             }
-        });
+        };
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
@@ -86,9 +81,11 @@ public class BasicTPActivity extends AppCompatActivity {
         (manger = XYList.load(new BasicTP()))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
                 .setDatas(list)
+                .setTypeList(iViewBehaviors)
+                .setDataLoad(iDataLoad)
                 .setEmptyView(emptyView)
                 .setDivider(5)
-                .into(findViewById(R.id.rc_list), itemViewBuilder);
+                .into(findViewById(R.id.rc_list));
     }
 
     private void setOnClick() {

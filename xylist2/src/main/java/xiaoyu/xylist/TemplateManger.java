@@ -7,8 +7,9 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import xiaoyu.xylist.adapter.ItemViewBuilder;
+import xiaoyu.xylist.interf.IDataLoad;
 import xiaoyu.xylist.interf.ITemplate;
+import xiaoyu.xylist.interf.IViewBehavior;
 
 /**
  * Created by lee on 16/10/8.
@@ -20,6 +21,8 @@ public class TemplateManger {
     private View mContentView;
     private View mEmptyView;
     private int mOptions;
+    private List<IViewBehavior> iViewBehaviors;
+    private IDataLoad iDataLoad;
     private List mDatas;
     private int dividePx;
 
@@ -69,7 +72,25 @@ public class TemplateManger {
         return mEmptyView;
     }
 
-    public TemplateManger into(View contentView, ItemViewBuilder itemViewBuilder) {
+    public TemplateManger setTypeList(List<IViewBehavior> viewBehaviorList) {
+        iViewBehaviors = viewBehaviorList;
+        return this;
+    }
+
+    public List<IViewBehavior> getTypeList() {
+        return iViewBehaviors;
+    }
+
+    public TemplateManger setDataLoad(IDataLoad dataLoad) {
+        iDataLoad = dataLoad;
+        return this;
+    }
+
+    public IDataLoad getDataLoad() {
+        return iDataLoad;
+    }
+
+    public TemplateManger into(View contentView) {
         mContentView = contentView;
 
         if (mContentView instanceof RecyclerView) {
@@ -77,7 +98,7 @@ public class TemplateManger {
             ((RecyclerView) mContentView).addItemDecoration(new SpaceItemDecoration(dividePx));
         }
 
-        mTemplate.setTemplateManager(this, contentView, itemViewBuilder);
+        mTemplate.setTemplateManager(this, contentView);
         return this;
     }
 

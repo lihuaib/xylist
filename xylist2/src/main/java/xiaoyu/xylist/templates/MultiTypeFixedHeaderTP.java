@@ -2,8 +2,9 @@ package xiaoyu.xylist.templates;
 
 import android.view.View;
 
-import xiaoyu.xylist.adapter.ItemViewBuilder;
-import xiaoyu.xylist.interf.IBuildItem;
+import java.util.List;
+
+import xiaoyu.xylist.interf.IViewBehavior;
 
 /**
  * Created by lee on 16/10/8.
@@ -32,50 +33,34 @@ public class MultiTypeFixedHeaderTP extends BaseTP {
     @Override
     public boolean setEmptyView() {
         if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
-            withEmptyViewBuilder = new ItemViewBuilder();
-            withEmptyViewBuilder.setDataLoad(itemViewBuilder.getDataLoad());
-            withEmptyViewBuilder.setiBuildItem(new IBuildItem() {
+            if(currentViewBehaviors.contains(footBehavior)) {
+                currentViewBehaviors.remove(footBehavior);
+            }
+
+            IViewBehavior emptyBehavior = new IViewBehavior() {
                 @Override
-                public void set(View view, int position, Object value) {
-                    if (position < getItemCount() - 1) {
-                        itemViewBuilder.getiBuildItem().set(view, position, value);
-                    }
+                public List getData() {
+                    return null;
                 }
 
                 @Override
-                public View get(int viewType) {
-                    if (viewType == TYPE_EMPTY) {
-                        View emptyView = mManager.getEmptyView();
-                        emptyView.setLayoutParams(recyclerView.getLayoutParams());
+                public View getView() {
+                    View emptyView = mManager.getEmptyView();
+                    emptyView.setLayoutParams(recyclerView.getLayoutParams());
 
-                        return emptyView;
-                    }
-
-                    return itemViewBuilder.getiBuildItem().get(viewType);
+                    return emptyView;
                 }
 
                 @Override
-                public int getItemType(int position) {
-                    if (mManager.getEmptyView() != null
-                            && position == getItemCount() - 1) {
-                        return TYPE_EMPTY;
-                    }
-                    return itemViewBuilder.getiBuildItem().getItemType(position);
+                public void setValue(Object o) {
                 }
+            };
+            currentViewBehaviors.add(emptyBehavior);
 
-                @Override
-                public int getItemCount() {
-                    if (mManager.getEmptyView() == null) {
-                        return itemViewBuilder.getiBuildItem().getItemCount();
-                    }
-                    return itemViewBuilder.getiBuildItem().getItemCount() + 1;
-                }
-            });
-
-            adapter.setItemViewBuilder(withEmptyViewBuilder);
+            adapter.setViewBehavior(currentViewBehaviors);
             return true;
         } else {
-            adapter.setItemViewBuilder(currentUsedViewBuilder);
+            adapter.setViewBehavior(currentViewBehaviors);
         }
 
         return false;

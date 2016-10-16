@@ -14,10 +14,8 @@ import java.util.List;
 import xiaoyu.xylist.TemplateManger;
 import xiaoyu.xylist.XYList;
 import xiaoyu.xylist.XYOptions;
-import xiaoyu.xylist.adapter.ItemViewBuilder;
-import xiaoyu.xylist.interf.IBuildItem;
 import xiaoyu.xylist.interf.IDataLoad;
-import xiaoyu.xylist.templates.BasicTP;
+import xiaoyu.xylist.interf.IViewBehavior;
 import xiaoyu.xylist.templates.swipe.SwipeItem;
 import xiaoyu.xylist.templates.swipe.SwipeTP;
 
@@ -25,7 +23,6 @@ public class SwipeActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
-    ItemViewBuilder itemViewBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +36,18 @@ public class SwipeActivity extends AppCompatActivity {
             list.add(i);
         }
 
-        itemViewBuilder = new ItemViewBuilder();
-        itemViewBuilder.setiBuildItem(new IBuildItem() {
+        List<IViewBehavior> iViewBehaviors = new ArrayList<>();
+        iViewBehaviors.add(new IViewBehavior() {
+            SwipeItem item;
+
             @Override
-            public void set(View view, int position, Object object) {
-                SwipeItem item = (SwipeItem) view;
-
-                TextView tv = (TextView) item.getContentView();
-                tv.setText(object.toString());
-
-                TextView tv2 = (TextView) item.getMenus();
-                tv2.setText("menu:" + object.toString());
+            public List getData() {
+                return list;
             }
 
             @Override
-            public View get(int viewType) {
-                SwipeItem item = new SwipeItem(SwipeActivity.this);
+            public View getView() {
+                item = new SwipeItem(SwipeActivity.this);
 
                 TextView textView = new TextView(SwipeActivity.this);
                 textView.setText("xxx");
@@ -75,17 +68,16 @@ public class SwipeActivity extends AppCompatActivity {
             }
 
             @Override
-            public int getItemCount() {
-                return list.size();
-            }
+            public void setValue(Object o) {
+                TextView tv = (TextView) item.getContentView();
+                tv.setText(o.toString());
 
-            @Override
-            public int getItemType(int position) {
-                return 0;
+                TextView tv2 = (TextView) item.getMenus();
+                tv2.setText("menu:" + o.toString());
             }
         });
 
-        itemViewBuilder.setDataLoad(new IDataLoad() {
+        IDataLoad iDataLoad = new IDataLoad() {
             @Override
             public void refresh() {
                 loadRefresh();
@@ -95,7 +87,7 @@ public class SwipeActivity extends AppCompatActivity {
             public void loadMore() {
                 SwipeActivity.this.loadMore();
             }
-        });
+        };
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
@@ -103,9 +95,11 @@ public class SwipeActivity extends AppCompatActivity {
         (manger = XYList.load(new SwipeTP()))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
                 .setDatas(list)
+                .setTypeList(iViewBehaviors)
+                .setDataLoad(iDataLoad)
                 .setEmptyView(emptyView)
                 .setDivider(5)
-                .into(findViewById(R.id.rc_list), itemViewBuilder);
+                .into(findViewById(R.id.rc_list));
     }
 
     private void setOnClick() {
