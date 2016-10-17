@@ -38,8 +38,8 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
         List<IViewBehavior> types = new ArrayList<>();
         types.add(new IViewBehavior() {
             @Override
-            public List getData() {
-                return null;
+            public boolean hasData() {
+                return false;
             }
 
             @Override
@@ -63,8 +63,8 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
 
         types.add(new IViewBehavior() {
             @Override
-            public List getData() {
-                return null;
+            public boolean hasData() {
+                return false;
             }
 
             @Override
@@ -88,8 +88,8 @@ public class MultiTypeFixedTPActivity extends AppCompatActivity {
 
         types.add(new IViewBehavior<Integer>() {
             @Override
-            public List getData() {
-                return list;
+            public boolean hasData() {
+                return true;
             }
 
             @Override

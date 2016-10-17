@@ -32,8 +32,8 @@ public class MultiTypeFixedHeaderTP extends BaseTP {
 
     protected IViewBehavior emptyBehavior = new IViewBehavior() {
         @Override
-        public List getData() {
-            return null;
+        public boolean hasData() {
+            return false;
         }
 
         @Override

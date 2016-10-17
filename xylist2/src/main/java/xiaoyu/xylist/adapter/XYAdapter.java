@@ -1,7 +1,6 @@
 package xiaoyu.xylist.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,11 +15,15 @@ import xiaoyu.xylist.interf.IViewBehavior;
 
 public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private TemplateManger mManager;
-    private List<IViewBehavior> iViewBehaviors;
+    protected TemplateManger mManager;
+    protected List<IViewBehavior> iViewBehaviors;
 
     public XYAdapter(TemplateManger manger) {
         mManager = manger;
+    }
+
+    public TemplateManger getManager() {
+        return mManager;
     }
 
     public void setViewBehavior(List<IViewBehavior> iViewBehaviorList) {
@@ -36,13 +39,11 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Log.d("lee", "onBindViewHolder position:" + position);
-
         int viewType = getItemViewType(position);
         IViewBehavior currBehavior = iViewBehaviors.get(viewType);
 
         if (currBehavior != null) {
-            if (currBehavior.getData() == null) {
+            if (!currBehavior.hasData()) {
                 currBehavior.setValue(holder.itemView, null);
             } else {
                 //TODO 这里只适合有多个type,但是只有一个type 是有数据的情况
@@ -66,10 +67,10 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         int len = 0, i, size = iViewBehaviors.size();
         for (i = 0; i < size; i++) {
             IViewBehavior behavior = iViewBehaviors.get(i);
-            if (behavior.getData() == null) {
+            if (!behavior.hasData()) {
                 len++;
             } else {
-                len += behavior.getData().size();
+                len += mManager.getDatas().size();
             }
             if (position < len) {
                 break;

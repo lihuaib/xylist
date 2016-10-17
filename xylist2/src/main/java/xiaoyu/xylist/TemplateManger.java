@@ -35,6 +35,10 @@ public class TemplateManger {
         return this;
     }
 
+    public ITemplate getTemplate() {
+        return mTemplate;
+    }
+
     public int getOptions() {
         return mOptions;
     }
@@ -42,13 +46,12 @@ public class TemplateManger {
     public TemplateManger setDatas(List datas) {
         System.out.println("setDatas TemplateManger");
 
-        if (datas == null) {
-            mDatas = null;
-        } else {
-            if (mDatas == null) {
-                mDatas = new ArrayList();
-            }
-            mDatas.clear();
+        if (mDatas == null) {
+            mDatas = new ArrayList();
+        }
+        mDatas.clear();
+
+        if (datas != null) {
             mDatas.addAll(datas);
         }
 

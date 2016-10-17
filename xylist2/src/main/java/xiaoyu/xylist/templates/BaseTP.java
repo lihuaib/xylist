@@ -81,7 +81,7 @@ public abstract class BaseTP implements ITemplate {
 
     public abstract boolean setEmptyView();
 
-    private void buildAdapter() {
+    protected void buildAdapter() {
         if (adapter == null) {
             adapter = new XYAdapter(mManager);
             adapter.setViewBehavior(currentViewBehaviors);
@@ -179,8 +179,8 @@ public abstract class BaseTP implements ITemplate {
 
             footBehavior = new IViewBehavior() {
                 @Override
-                public List getData() {
-                    return null;
+                public boolean hasData() {
+                    return false;
                 }
 
                 @Override
@@ -247,10 +247,10 @@ public abstract class BaseTP implements ITemplate {
     protected int getItemCount() {
         int cnt = 0;
         for (IViewBehavior behavior : currentViewBehaviors) {
-            if (behavior.getData() == null) {
+            if (!behavior.hasData()) {
                 cnt++;
             } else {
-                cnt += behavior.getData().size();
+                cnt += mManager.getDatas().size();
             }
         }
         return cnt;

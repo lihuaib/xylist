@@ -8,7 +8,7 @@ import java.util.List;
  * Created by lee on 16/10/8.
  */
 public interface IViewBehavior<T> {
-    List getData();
+    boolean hasData();
 
     View getView();
     void setValue(View view, T t);

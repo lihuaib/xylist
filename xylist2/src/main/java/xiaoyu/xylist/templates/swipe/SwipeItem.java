@@ -1,17 +1,20 @@
 package xiaoyu.xylist.templates.swipe;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.RelativeLayout;
+
+import xiaoyu.xylist.adapter.XYAdapter;
 
 /**
  * Created by lee on 16/10/16.
@@ -27,22 +30,19 @@ public class SwipeItem extends RelativeLayout {
 
     private ScrollerCompat mOpenScroller;
     private GestureDetectorCompat mGestureDetector;
+    private OnClickListener mOnClickListener;
 
     int duration = 200;
     float mDownX = 0;
     boolean isMoved = false;
     boolean isOpen = false;
 
-    public SwipeItem(Context context) {
-        this(context, null);
-    }
+    SwipeTP mSwipeTP;
 
-    public SwipeItem(Context context, AttributeSet attr) {
-        this(context, attr, 0);
-    }
+    public SwipeItem(Context context, SwipeTP swipeTP) {
+        super(context, null);
+        mSwipeTP = swipeTP;
 
-    public SwipeItem(Context context, AttributeSet attr, int defStyle) {
-        super(context, attr, defStyle);
         init();
     }
 
@@ -59,6 +59,16 @@ public class SwipeItem extends RelativeLayout {
     }
 
     @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+
+        mSwipeTP.setSwipeItemHeight(getHeight());
+        mSwipeTP.setContentWidth(vContent.getWidth());
+        mSwipeTP.setMenuWidth(vMenus.getWidth());
+
+        return super.drawChild(canvas, child, drawingTime);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean res = mGestureDetector.onTouchEvent(event);
 
@@ -69,6 +79,10 @@ public class SwipeItem extends RelativeLayout {
 
                 swipeEffect(dis);
             }
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                return false;
+            }
         }
 
         return res;
@@ -78,14 +92,20 @@ public class SwipeItem extends RelativeLayout {
         vContent = content;
         vMenus = menus;
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         vContent.setLayoutParams(params);
 
-        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                mSwipeTP.getSwipeItemHeight() == 0 ? LayoutParams.MATCH_PARENT : mSwipeTP.getSwipeItemHeight());
         vMenus.setLayoutParams(params2);
 
         this.addView(vMenus);
         this.addView(vContent);
+
+        if (mSwipeTP.isAllItemMenuOpen) {
+            openMenu();
+            invalidate();
+        }
     }
 
     public View getContentView() {
@@ -99,6 +119,11 @@ public class SwipeItem extends RelativeLayout {
     public void closeMenu() {
         swipeEffect(0);
         isOpen = false;
+    }
+
+    public void openMenu() {
+        onSwipe(mSwipeTP.getMenuWidth());
+        isOpen = true;
     }
 
     public boolean isOpen() {
@@ -134,7 +159,12 @@ public class SwipeItem extends RelativeLayout {
     * 在移动的过程中， 重新布局整个 item
     * */
     private void onSwipe(int dis) {
-        int maxDis = vMenus.getWidth();
+        if (vMenus.getHeight() < mSwipeTP.getSwipeItemHeight()) {
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, mSwipeTP.getSwipeItemHeight());
+            vMenus.setLayoutParams(params);
+        }
+
+        int maxDis = mSwipeTP.getMenuWidth();
         boolean toLeft = dis >= 0;
         dis = Math.abs(dis);
         if (dis > maxDis)
@@ -144,24 +174,24 @@ public class SwipeItem extends RelativeLayout {
         int rl_rleft;
         if (toLeft) { // 向左移动
             rl_left = -dis;
-            rl_rleft = vContent.getWidth() - dis;
+            rl_rleft = mSwipeTP.getContentWidth() - dis;
 
-            vContent.layout(rl_left, vContent.getTop(), vContent.getWidth() + rl_left, vContent.getBottom());
-            vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + vMenus.getWidth(), vMenus.getBottom());
+            vContent.layout(rl_left, vContent.getTop(), mSwipeTP.getContentWidth() + rl_left, vContent.getBottom());
+            vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + mSwipeTP.getMenuWidth(), vMenus.getBottom());
         } else { // 向右移动
             rl_left = dis - maxDis;
-            rl_rleft = vContent.getWidth() + dis - maxDis;
+            rl_rleft = mSwipeTP.getContentWidth() + dis - maxDis;
 
             if (vContent.getLeft() >= 0) return;
-            vContent.layout(rl_left, vContent.getTop(), vContent.getWidth() + rl_left, vContent.getBottom());
-            vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + vMenus.getWidth(), vMenus.getBottom());
+            vContent.layout(rl_left, vContent.getTop(), mSwipeTP.getContentWidth() + rl_left, vContent.getBottom());
+            vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + mSwipeTP.getMenuWidth(), vMenus.getBottom());
         }
     }
 
     private void swipeEffect(int dis) {
         boolean toLeft = dis >= 0;
         dis = Math.abs(dis);
-        int rwidth = vMenus.getWidth();
+        int rwidth = mSwipeTP.getMenuWidth();
         if (dis > rwidth) dis = rwidth;
 
         int rl_left;
@@ -170,11 +200,11 @@ public class SwipeItem extends RelativeLayout {
         if (dis >= rwidth / 2) {
             if (toLeft) { // 向左滑动
                 rl_left = -rwidth;
-                rl_rleft = vContent.getWidth() - rwidth;
+                rl_rleft = mSwipeTP.getContentWidth() - rwidth;
                 mOpenScroller.startScroll(-(rwidth - dis), 0, (rwidth - dis), 0, duration);
             } else { // 向右滑动
                 rl_left = 0;
-                rl_rleft = vContent.getWidth();
+                rl_rleft = mSwipeTP.getContentWidth();
                 mOpenScroller.startScroll(rwidth - dis, 0, -(rwidth - dis), 0, duration);
             }
             closeOtherMenu();
@@ -183,16 +213,16 @@ public class SwipeItem extends RelativeLayout {
             // 恢复到默认位置
             if (toLeft) { // 向左滑动, 则恢复到右边的原来状态
                 rl_left = 0;
-                rl_rleft = vContent.getWidth();
+                rl_rleft = mSwipeTP.getContentWidth();
                 mOpenScroller.startScroll(dis, 0, -dis, 0, duration);
             } else { // 向右滑动 则恢复到左边的原来状态
                 rl_left = -rwidth;
-                rl_rleft = vContent.getWidth() - rwidth;
+                rl_rleft = mSwipeTP.getContentWidth() - rwidth;
                 mOpenScroller.startScroll(-dis, 0, dis, 0, duration);
             }
         }
-        vContent.layout(rl_left, vContent.getTop(), vContent.getWidth() + rl_left, vContent.getBottom());
-        vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + vMenus.getWidth(), vMenus.getBottom());
+        vContent.layout(rl_left, vContent.getTop(), mSwipeTP.getContentWidth() + rl_left, vContent.getBottom());
+        vMenus.layout(rl_rleft, vMenus.getTop(), rl_rleft + mSwipeTP.getMenuWidth(), vMenus.getBottom());
 
         invalidate();
     }
@@ -213,16 +243,20 @@ public class SwipeItem extends RelativeLayout {
 
     private void closeOtherMenu() {
         RecyclerView recyclerView = (RecyclerView) this.getParent();
-        closeOtherItemMenu((LinearLayoutManager) recyclerView.getLayoutManager());
+        chgOtherItemMenuStatus((LinearLayoutManager) recyclerView.getLayoutManager(), false);
     }
 
-    public static void closeOtherItemMenu(LinearLayoutManager manager) {
+    public static void chgOtherItemMenuStatus(LinearLayoutManager manager, boolean open) {
         int count = manager.getChildCount();
         for (int i = 0; i < count; i++) {
             if (manager.getChildAt(i) instanceof SwipeItem) {
                 SwipeItem item = (SwipeItem) manager.getChildAt(i);
-                if (item.isOpen) {
-                    item.closeMenu();
+                if (open) {
+                    item.openMenu();
+                } else {
+                    if (item.isOpen) {
+                        item.closeMenu();
+                    }
                 }
             }
         }

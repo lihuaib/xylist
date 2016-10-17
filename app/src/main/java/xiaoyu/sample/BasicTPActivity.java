@@ -40,8 +40,8 @@ public class BasicTPActivity extends AppCompatActivity {
         List<IViewBehavior> iViewBehaviors = new ArrayList<>();
         iViewBehaviors.add(new IViewBehavior() {
             @Override
-            public List getData() {
-                return list;
+            public boolean hasData() {
+                return true;
             }
 
             @Override

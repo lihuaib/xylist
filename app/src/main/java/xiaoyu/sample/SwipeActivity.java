@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -36,16 +37,17 @@ public class SwipeActivity extends AppCompatActivity {
             list.add(i);
         }
 
+        final SwipeTP template = new SwipeTP();
         List<IViewBehavior> iViewBehaviors = new ArrayList<>();
         iViewBehaviors.add(new IViewBehavior() {
             @Override
-            public List getData() {
-                return list;
+            public boolean hasData() {
+                return true;
             }
 
             @Override
             public View getView() {
-                SwipeItem item = new SwipeItem(SwipeActivity.this);
+                SwipeItem item = new SwipeItem(SwipeActivity.this, template);
 
                 TextView textView = new TextView(SwipeActivity.this);
                 textView.setText("xxx");
@@ -58,6 +60,12 @@ public class SwipeActivity extends AppCompatActivity {
                 textView2.setBackgroundColor(Color.WHITE);
 
                 item.setViews(textView, textView2);
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("lee", "swipe item click");
+                    }
+                });
 
                 RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 item.setLayoutParams(params);
@@ -90,7 +98,7 @@ public class SwipeActivity extends AppCompatActivity {
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new SwipeTP()))
+        (manger = XYList.load(template))
                 .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
                 .setDatas(list)
                 .setTypeList(iViewBehaviors)

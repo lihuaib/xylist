@@ -27,6 +27,12 @@ import xiaoyu.xylist.templates.BasicTP;
  */
 public class SwipeTP extends BasicTP {
 
+    protected boolean isAllItemMenuOpen = false;
+
+    protected int swipeItemHeight;
+    protected int contentWidth;
+    protected int menuWidth;
+
     public SwipeTP() {
     }
 
@@ -44,8 +50,45 @@ public class SwipeTP extends BasicTP {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                SwipeItem.closeOtherItemMenu(linearLayoutManager);
+                SwipeItem.chgOtherItemMenuStatus(linearLayoutManager, isAllItemMenuOpen);
             }
         }
     };
+
+    public boolean isAllItemMenuOpen() {
+        return isAllItemMenuOpen;
+    }
+
+    public void setAllItemMenuOpen(boolean allItemMenuOpen) {
+        isAllItemMenuOpen = allItemMenuOpen;
+
+        SwipeItem.chgOtherItemMenuStatus(linearLayoutManager, allItemMenuOpen);
+    }
+
+    public int getSwipeItemHeight() {
+        return swipeItemHeight;
+    }
+
+    public void setSwipeItemHeight(int swipeItemHeight) {
+        if (this.swipeItemHeight < swipeItemHeight)
+            this.swipeItemHeight = swipeItemHeight;
+    }
+
+    public int getContentWidth() {
+        return contentWidth;
+    }
+
+    public void setContentWidth(int contentWidth) {
+        if (this.contentWidth < contentWidth)
+            this.contentWidth = contentWidth;
+    }
+
+    public int getMenuWidth() {
+        return menuWidth;
+    }
+
+    public void setMenuWidth(int menuWidth) {
+        if (this.menuWidth < menuWidth)
+            this.menuWidth = menuWidth;
+    }
 }
