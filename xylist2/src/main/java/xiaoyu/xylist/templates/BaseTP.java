@@ -189,13 +189,15 @@ public abstract class BaseTP implements ITemplate {
                 }
 
                 @Override
-                public void setValue(Object o) {
+                public void setValue(View v, Object o) {
                 }
             };
-            currentViewBehaviors.add(footBehavior);
 
             adapter.setViewBehavior(currentViewBehaviors);
         }
+
+        currentViewBehaviors.remove(footBehavior);
+        currentViewBehaviors.add(footBehavior);
 
         recyclerView.removeOnScrollListener(mScrollListener);
         xyFooterView.setOnClickListener(null);
@@ -224,7 +226,7 @@ public abstract class BaseTP implements ITemplate {
             if (dy <= 0) return;
 
             int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
-            if (lastVisibleItemPosition == getItemCount()) {
+            if (lastVisibleItemPosition >= getItemCount() - 1) {
                 xyFooterView.setStatus(XYFooterView.STATUS_LOADING);
                 mManager.getDataLoad().loadMore();
             }

@@ -1,5 +1,6 @@
 package xiaoyu.xylist.templates;
 
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
@@ -30,39 +31,42 @@ import xiaoyu.xylist.interf.IViewBehavior;
  */
 public class MultiTypeFixedHeaderTP extends BaseTP {
 
+    protected IViewBehavior emptyBehavior = new IViewBehavior() {
+        @Override
+        public List getData() {
+            return null;
+        }
+
+        @Override
+        public View getView() {
+            View emptyView = mManager.getEmptyView();
+            emptyView.setLayoutParams(recyclerView.getLayoutParams());
+
+            return emptyView;
+        }
+
+        @Override
+        public void setValue(View v, Object o) {
+        }
+    };
+
     @Override
     public boolean setEmptyView() {
+        currentViewBehaviors.remove(emptyBehavior);
+
         if (mManager.getDatas() == null || mManager.getDatas().size() == 0) {
-            if(currentViewBehaviors.contains(footBehavior)) {
-                currentViewBehaviors.remove(footBehavior);
-            }
-
-            IViewBehavior emptyBehavior = new IViewBehavior() {
-                @Override
-                public List getData() {
-                    return null;
-                }
-
-                @Override
-                public View getView() {
-                    View emptyView = mManager.getEmptyView();
-                    emptyView.setLayoutParams(recyclerView.getLayoutParams());
-
-                    return emptyView;
-                }
-
-                @Override
-                public void setValue(Object o) {
-                }
-            };
+            currentViewBehaviors.remove(footBehavior);
             currentViewBehaviors.add(emptyBehavior);
 
             adapter.setViewBehavior(currentViewBehaviors);
+            recyclerView.setAdapter(adapter);
+
             return true;
         } else {
             adapter.setViewBehavior(currentViewBehaviors);
-        }
+            recyclerView.setAdapter(adapter);
 
-        return false;
+            return false;
+        }
     }
 }

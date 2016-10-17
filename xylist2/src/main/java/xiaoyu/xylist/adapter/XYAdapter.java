@@ -1,13 +1,13 @@
 package xiaoyu.xylist.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import xiaoyu.xylist.TemplateManger;
-import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.interf.IViewBehavior;
 
 /**
@@ -36,29 +36,19 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int len = 0, cnt = 0;
-        IViewBehavior currBehavior = null;
-        for (IViewBehavior behavior : iViewBehaviors) {
-            if (behavior.getData() == null) {
-                len++;
-            } else {
-                len += behavior.getData().size();
-            }
+        Log.d("lee", "onBindViewHolder position:" + position);
 
-            if (position < len) {
-                currBehavior = behavior;
-                break;
-            }
-
-            cnt++;
-        }
+        int viewType = getItemViewType(position);
+        IViewBehavior currBehavior = iViewBehaviors.get(viewType);
 
         if (currBehavior != null) {
             if (currBehavior.getData() == null) {
-                currBehavior.setValue(null);
+                currBehavior.setValue(holder.itemView, null);
             } else {
-                int pos = position - cnt;
-                currBehavior.setValue(mManager.getDatas().get(pos));
+                //TODO 这里只适合有多个type,但是只有一个type 是有数据的情况
+                int pos = position - viewType;
+
+                currBehavior.setValue(holder.itemView, mManager.getDatas().get(pos));
             }
         }
     }
@@ -67,10 +57,6 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         int total = iViewBehaviors.size() - 1;
         total += mManager.getDatas() != null ? mManager.getDatas().size() : 0;
-
-        if (isNeedFooter()) {
-            total++;
-        }
 
         return total;
     }
@@ -90,8 +76,6 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
 
-        if(i >= size) i = size - 1;
-
         return i;
     }
 
@@ -99,9 +83,5 @@ public class XYAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public ItemHolder(View itemView) {
             super(itemView);
         }
-    }
-
-    private boolean isNeedFooter() {
-        return XYOptions.isContains(XYOptions.canLoadMore, mManager.getOptions());
     }
 }

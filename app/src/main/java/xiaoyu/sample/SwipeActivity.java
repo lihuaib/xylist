@@ -38,8 +38,6 @@ public class SwipeActivity extends AppCompatActivity {
 
         List<IViewBehavior> iViewBehaviors = new ArrayList<>();
         iViewBehaviors.add(new IViewBehavior() {
-            SwipeItem item;
-
             @Override
             public List getData() {
                 return list;
@@ -47,7 +45,7 @@ public class SwipeActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                item = new SwipeItem(SwipeActivity.this);
+                SwipeItem item = new SwipeItem(SwipeActivity.this);
 
                 TextView textView = new TextView(SwipeActivity.this);
                 textView.setText("xxx");
@@ -68,11 +66,11 @@ public class SwipeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setValue(Object o) {
-                TextView tv = (TextView) item.getContentView();
+            public void setValue(View item, Object o) {
+                TextView tv = (TextView) ((SwipeItem) item).getContentView();
                 tv.setText(o.toString());
 
-                TextView tv2 = (TextView) item.getMenus();
+                TextView tv2 = (TextView) ((SwipeItem) item).getMenus();
                 tv2.setText("menu:" + o.toString());
             }
         });

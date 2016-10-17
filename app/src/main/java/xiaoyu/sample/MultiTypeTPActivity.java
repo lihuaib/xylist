@@ -37,8 +37,6 @@ public class MultiTypeTPActivity extends AppCompatActivity {
 
         List<IViewBehavior> types = new ArrayList<>();
         types.add(new IViewBehavior() {
-            TextView textView;
-
             @Override
             public List getData() {
                 return null;
@@ -46,7 +44,7 @@ public class MultiTypeTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                textView = new TextView(MultiTypeTPActivity.this);
+                TextView textView = new TextView(MultiTypeTPActivity.this);
 
                 textView.setBackgroundColor(Color.BLACK);
 
@@ -57,14 +55,13 @@ public class MultiTypeTPActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setValue(Object o) {
-                if (textView == null) return;
-                textView.setText("");
+            public void setValue(View v, Object o) {
+                if (v == null) return;
+                ((TextView) v).setText("");
             }
         });
 
         types.add(new IViewBehavior() {
-            TextView textView;
 
             @Override
             public List getData() {
@@ -73,7 +70,7 @@ public class MultiTypeTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                textView = new TextView(MultiTypeTPActivity.this);
+                TextView textView = new TextView(MultiTypeTPActivity.this);
 
                 textView.setBackgroundColor(Color.RED);
 
@@ -84,15 +81,13 @@ public class MultiTypeTPActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setValue(Object o) {
+            public void setValue(View textView, Object o) {
                 if (textView == null) return;
-                textView.setText("");
+                ((TextView) textView).setText("");
             }
         });
 
-        types.add(new IViewBehavior<String>() {
-            TextView textView;
-
+        types.add(new IViewBehavior<Integer>() {
             @Override
             public List getData() {
                 return list;
@@ -100,7 +95,7 @@ public class MultiTypeTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                textView = new TextView(MultiTypeTPActivity.this);
+                TextView textView = new TextView(MultiTypeTPActivity.this);
 
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
@@ -113,9 +108,9 @@ public class MultiTypeTPActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setValue(String o) {
-                if (textView == null) return;
-                textView.setText(o);
+            public void setValue(View v, Integer o) {
+                if (v == null) return;
+                ((TextView) v).setText(o + "");
             }
         });
 

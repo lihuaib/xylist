@@ -11,5 +11,5 @@ public interface IViewBehavior<T> {
     List getData();
 
     View getView();
-    void setValue(T t);
+    void setValue(View view, T t);
 }

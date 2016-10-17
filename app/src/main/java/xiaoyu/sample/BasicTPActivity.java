@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -38,8 +39,6 @@ public class BasicTPActivity extends AppCompatActivity {
 
         List<IViewBehavior> iViewBehaviors = new ArrayList<>();
         iViewBehaviors.add(new IViewBehavior() {
-            TextView textView;
-
             @Override
             public List getData() {
                 return list;
@@ -47,7 +46,7 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                textView = new TextView(BasicTPActivity.this);
+                TextView textView = new TextView(BasicTPActivity.this);
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
                 textView.setBackgroundResource(R.color.colorPrimaryDark);
@@ -58,8 +57,9 @@ public class BasicTPActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setValue(Object o) {
-                textView.setText(o.toString());
+            public void setValue(View v, Object o) {
+                Log.d("lee", "value:" + o);
+                ((TextView) v).setText(o.toString());
             }
         });
 
