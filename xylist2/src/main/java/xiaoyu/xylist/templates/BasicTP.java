@@ -30,8 +30,8 @@ public class BasicTP extends BaseTP {
             findListViewPos();
 
             View view = mManager.getEmptyView();
-            parentGroup.removeViewAt(listViewPos);
             if(view == null) return true;
+            parentGroup.removeViewAt(listViewPos);
 
             if (ptrFrameLayout == null) {
                 view.setLayoutParams(recyclerView.getLayoutParams());
