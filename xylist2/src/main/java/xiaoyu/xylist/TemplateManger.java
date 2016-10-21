@@ -80,6 +80,12 @@ public class TemplateManger {
         return this;
     }
 
+    public TemplateManger setType(IViewBehavior viewBehavior) {
+        iViewBehaviors = new ArrayList<>();
+        iViewBehaviors.add(viewBehavior);
+        return this;
+    }
+
     public List<IViewBehavior> getTypeList() {
         return iViewBehaviors;
     }
@@ -105,9 +111,17 @@ public class TemplateManger {
         return this;
     }
 
+    public View getContentView() {
+        return mContentView;
+    }
+
     public TemplateManger setDivider(int dp) {
         dividePx = dp;
         return this;
+    }
+
+    public int getDividePx() {
+        return dividePx;
     }
 
     private void dpToPx() {

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffffff"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <Button
+        android:id="@+id/btn_redirect0"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: BasicTP 单一数据" />
+
+    <Button
+        android:id="@+id/btn_redirect1"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: BasicTP 多类型数据 1" />
+
+    <Button
+        android:id="@+id/btn_redirect2"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: MultiTypeFixedHeaderTP  多类型数据 2" />
+
+    <Button
+        android:id="@+id/btn_redirect3"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: SwipeTP 想左滚动, 可以删除" />
+
+    <Button
+        android:id="@+id/btn_redirect4"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: HorizonPager 左右可以滚动" />
+
+    <Button
+        android:id="@+id/btn_redirect5"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="模版: ViewPager 左右可以滚动" />
+</LinearLayout>

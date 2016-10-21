@@ -74,7 +74,7 @@ public abstract class BaseTP implements ITemplate {
         adapter.notifyDataSetChanged();
     }
 
-    private void init() {
+    protected void init() {
         buildAdapter();
         setListView();
     }
@@ -91,7 +91,7 @@ public abstract class BaseTP implements ITemplate {
         }
     }
 
-    private void setListView() {
+    protected void setListView() {
         if (isOption(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)) {
             buildPtrFrameLayout();
             setHeader();

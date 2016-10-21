@@ -1,11 +1,11 @@
 package xiaoyu.sample;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,11 +19,14 @@ import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.interf.IDataLoad;
 import xiaoyu.xylist.interf.IViewBehavior;
 import xiaoyu.xylist.templates.BasicTP;
+import xiaoyu.xylist.templates.ViewPagerTP.RecyclerViewPager;
+import xiaoyu.xylist.templates.ViewPagerTP.ViewPagerTP;
 
-public class BasicTPActivity extends AppCompatActivity {
+public class ViewPagerTPActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +40,10 @@ public class BasicTPActivity extends AppCompatActivity {
             list.add(i);
         }
 
+        recyclerView = (RecyclerView) findViewById(R.id.rc_list);
+
         List<IViewBehavior> iViewBehaviors = new ArrayList<>();
-        iViewBehaviors.add(new IViewBehavior() {
+        iViewBehaviors.add(new IViewBehavior<Integer>() {
             @Override
             public boolean hasData() {
                 return true;
@@ -46,20 +51,26 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                TextView textView = new TextView(BasicTPActivity.this);
+                TextView textView = new TextView(ViewPagerTPActivity.this);
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
                 textView.setBackgroundResource(R.color.colorPrimaryDark);
-                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(650, ViewGroup.LayoutParams.MATCH_PARENT);
                 textView.setLayoutParams(params);
 
                 return textView;
             }
 
             @Override
-            public void setValue(View v, Object o) {
-                Log.d("lee", "value:" + o);
-                ((TextView) v).setText(o.toString());
+            public void setValue(View v, Integer integer) {
+                TextView tv = (TextView) v;
+                tv.setText(integer + "");
+
+                if (integer % 2 == 0) {
+                    tv.setBackgroundColor(Color.RED);
+                } else {
+                    tv.setBackgroundColor(Color.BLACK);
+                }
             }
         });
 
@@ -71,21 +82,20 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                BasicTPActivity.this.loadMore();
+                ViewPagerTPActivity.this.loadMore();
             }
         };
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new BasicTP()))
-                .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
+        (manger = XYList.load(new ViewPagerTP()))
                 .setDatas(list)
                 .setTypeList(iViewBehaviors)
                 .setDataLoad(iDataLoad)
                 .setEmptyView(emptyView)
                 .setDivider(5)
-                .into(findViewById(R.id.rc_list));
+                .into(recyclerView);
     }
 
     private void setOnClick() {

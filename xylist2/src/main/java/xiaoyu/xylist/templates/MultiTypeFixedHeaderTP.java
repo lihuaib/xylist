@@ -2,8 +2,6 @@ package xiaoyu.xylist.templates;
 
 import android.view.View;
 
-import java.util.List;
-
 import xiaoyu.xylist.interf.IViewBehavior;
 
 /**

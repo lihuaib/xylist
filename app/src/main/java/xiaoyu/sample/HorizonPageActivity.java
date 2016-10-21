@@ -1,6 +1,5 @@
 package xiaoyu.sample;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +18,9 @@ import xiaoyu.xylist.XYOptions;
 import xiaoyu.xylist.interf.IDataLoad;
 import xiaoyu.xylist.interf.IViewBehavior;
 import xiaoyu.xylist.templates.BasicTP;
+import xiaoyu.xylist.templates.HorizonPageTP.HorizonPageTP;
 
-public class BasicTPActivity extends AppCompatActivity {
+public class HorizonPageActivity extends AppCompatActivity {
 
     TemplateManger manger;
     List<Integer> list;
@@ -46,11 +46,11 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public View getView() {
-                TextView textView = new TextView(BasicTPActivity.this);
+                TextView textView = new TextView(HorizonPageActivity.this);
                 textView.setText("xxx");
                 textView.setTextColor(Color.WHITE);
                 textView.setBackgroundResource(R.color.colorPrimaryDark);
-                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(300, ViewGroup.LayoutParams.MATCH_PARENT);
                 textView.setLayoutParams(params);
 
                 return textView;
@@ -71,15 +71,14 @@ public class BasicTPActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                BasicTPActivity.this.loadMore();
+                HorizonPageActivity.this.loadMore();
             }
         };
 
         TextView emptyView = new TextView(this);
         emptyView.setText("没有数据");
 
-        (manger = XYList.load(new BasicTP()))
-                .setOptions(XYOptions.canPulltoRefresh | XYOptions.canLoadMore)
+        (manger = XYList.load(new HorizonPageTP()))
                 .setDatas(list)
                 .setTypeList(iViewBehaviors)
                 .setDataLoad(iDataLoad)
