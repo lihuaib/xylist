@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="xiaoyu.sample.BasicTPActivity" />
+        <activity android:name="xiaoyu.sample.BasicTPActivity" android:screenOrientation="landscape" />
         <activity android:name="xiaoyu.sample.MultiTypeTPActivity" />
         <activity android:name="xiaoyu.sample.MultiTypeFixedTPActivity" />
         <activity android:name="xiaoyu.sample.SwipeActivity" />
